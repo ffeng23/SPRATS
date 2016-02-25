@@ -30,6 +30,6 @@ The idea is to combine the RUs from two different source
 	slots for the object.
 }
 \seealso{
-\code{\link{ReadSensorgramData}} \code{\link{SensorgramData}} \code{\link{plot}} \code{\link{SaveSPRData}}
+\code{\link{ReadSensorgramData}} \code{\link{SensorgramData-class}} \code{\link{plot}} \code{\link{SaveSPRData}}
 }
 

@@ -20,6 +20,6 @@ Generic function to plot the sensorgram of SPR.
 	the steady state window.
 }
 \seealso{
-\code{\link{ReadSensorgramData}} \code{\link{SensorgramData}} \code{\link{SaveSPRData}}
+\code{\link{ReadSensorgramData}} \code{\link{SensorgramData-class}} \code{\link{SaveSPRData}}
 }
 

@@ -23,6 +23,6 @@ It save the object data to the disk in a text format,
 	There is nothing wrong with it. Simple ignore this warning.
 }
 \seealso{
-\code{\link{ReadSensorgramData}} \code{\link{SensorgramData}} \code{\link{plot}}
+\code{\link{ReadSensorgramData}} \code{\link{SensorgramData-class}} \code{\link{plot}}
 }
 

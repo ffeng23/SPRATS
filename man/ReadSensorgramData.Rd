@@ -68,6 +68,6 @@ start at time zero.!!! relative to the
 dissociationPhaseStart/associationPhaseEnd
 }
 \seealso{
-\code{\link{SensorgramData}} \code{\link{plot}} \code{\link{SaveSPRData}}
+\code{\link{SensorgramData-class}} \code{\link{plot}} \code{\link{SaveSPRData}}
 }
 
