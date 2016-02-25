@@ -1,0 +1,17 @@
+Package: SPRATS
+Type: Package
+Title: An R package to do Two state modelling of SPR data
+Version: 1.0
+Date: 2016-02-23
+Author: Feng Feng, Sila Actza, Grace Kepler, Thomas Kepler
+Maintainer: Feng Feng <ffeng@BU.edu>
+Description: This R package is written to analyze SPR data to estimate the mean
+    equilibrium dissociation constant and the mean dissociation rate constant by
+    approximation
+License: MIT + file LICENSE
+Depends:
+    R (>= 3.2.0)
+Imports:
+    MASS
+URL: https://github.com/ffeng23/SPRATS.git
+RoxygenNote: 5.0.1

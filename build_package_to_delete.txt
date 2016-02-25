@@ -1,0 +1,19 @@
+#code to run R package
+#namespace to import export
+#example for each methods
+
+setwd( "e:/feng/LAB/hg/SPR_models/SPRATS/SPRATS")
+
+devtools::document()
+remove.packages("SPRATS")
+setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
+devtools::install("SPRATS")
+
+setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
+install.packages(c("SPRATS"),repos=NULL, type="source")
+
+
+
+library(SPRATS)
+
+?"SensorgramData-class"
