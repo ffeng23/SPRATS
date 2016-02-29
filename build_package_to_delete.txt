@@ -1,19 +1,26 @@
 #code to run R package
 #namespace to import export
 #example for each methods
-
+#feng's directory
 setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
 
+#call roxygen2 to process the helper pages from the roxygen comments
 devtools::document()
+
+#remove
 remove.packages("SPRATS")
+
+#feng's directory to call to install
 setwd( "e:/feng/LAB/hg/SPR_models")
+#install from local directory, but this is different from install.packages
 devtools::install("SPRATS")
 
+#install from local using install.packages utility
 setwd( "e:/feng/LAB/hg/SPR_models")
 install.packages(c("SPRATS"),repos=NULL, type="source")
 
-
-
+#load the package
 library(SPRATS)
 
+#call to show the man page of the class.
 ?"SensorgramData-class"
