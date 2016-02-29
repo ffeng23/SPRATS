@@ -1588,7 +1588,7 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 			else
 			{
 				#estimate the empirical rate of dissociation
-				cat("not implemented yet..........\n")
+				#cat("not implemented yet..........\n")
 				for(i in 1:length(x@analyteConcentrations))
 				{
 					times<-x@dissociationData[,i*2-1]
