@@ -1547,12 +1547,12 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 				
 				for(i in 1:length(x@analyteConcentrations))
 				{
-					if(x@analyteConcentrations<=0)
+					if(x@analyteConcentrations[i]<=0)
 					{
 						#we do the conc=0 series in this case
 						next
 					}
-					cat("running ", i,"\n");
+					#cat("running ", i,"\n");
 					#doing the nls for each dissociation phase
 					#startList<-
 					if(is.null(init.dissociation))
