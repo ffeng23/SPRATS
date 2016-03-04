@@ -395,6 +395,8 @@ SaveSPRData<-function(DATA, file, sep="\t")
 #'@slot koff numeric dissociation rate constant
 #'@slot analyteConcentrations numeric vector for different
 #'		analyte concentrations.
+#'@slot sd numeric standard deviation of the Gaussian noise. 
+#'		by default sd=0, which there is no noise.
 #'@slot Rmax numeric the maximum RUs levels at the infinite
 #'		high analyte concentration.
 #'@slot associationLength numeric the time period to run the association
@@ -419,13 +421,13 @@ setClass("LangmuirModel",
 					   R0="numeric",#vector optional, if not set the R0 will be getting values from the end of association phase
 					   offset="numeric" ###optional, might be used in the future
 		               ),
-		prototype(kon=-1,
-					   koff=-1,
-					   sd=-1,
+		prototype(kon=NULL,
+					   koff=NULL,
+					   sd=0,
 					   analyteConcentrations=numeric(), #vector
-					   Rmax=-1, 
-					   associationLength=-1,
-					   dissociationLength=-1,
+					   Rmax=NULL, 
+					   associationLength=NULL,
+					   dissociationLength=NULL,
 					   R0=numeric(),#optional, if not set the R0 will be getting values from the end of association phase
 					   offset=0 ###optional, might be used in the future
 				)	   
@@ -450,21 +452,21 @@ setMethod("CheckModelValidity", c("object"="LangmuirModel"),
 		function(object)
 		{
 			#first check for data integrity
-				if(object@kon<0){
+				if(is.null(object@kon)){
 					cat("kon is not set correctly\n")
 					return(FALSE)
 				}
 				
-				if(object@koff<0)
+				if(is.null(object@koff))
 				{
 					cat("koff is not set correctly\n")
 					return(FALSE)
 				}
-		    if(length(object@sd)<0)
-		    {
-		      cat("Standard deviation is not set correctly\n")
-		      return(FALSE)
-		    }
+		    #if(is.null(object@sd))
+		    #{
+		    #  cat("Standard deviation is not set correctly\n")
+		    #  return(FALSE)
+		    #}
 		    if(length(object@analyteConcentrations)<=0)
 				{
 					cat("analyteConcentrations are empty\n")
@@ -475,7 +477,7 @@ setMethod("CheckModelValidity", c("object"="LangmuirModel"),
 					cat("analyteConctrations are not set correctly\n")
 					return(FALSE)
 				}
-				if(object@Rmax<0)
+				if(is.null(object@Rmax))
 				{
 					cat("Rmax is not set correctly\n")
 					return(FALSE)
@@ -491,7 +493,7 @@ setMethod("CheckModelValidity", c("object"="LangmuirModel"),
 					return(FALSE)
 				}
 				#check the special case, where R0 has not been set, and we also did run association
-				if(object@associationLength<0&&object@dissociationLength>0&&length(object@R0)==0)
+				if(is.null(object@associationLength)&&is.null(object@dissociationLength)&&length(object@R0)==0)
 				{
 					cat("it has specified to run dissociation only, but R0 has not been set")
 					return(FALSE)
@@ -510,7 +512,7 @@ setValidity("LangmuirModel",
 #'@seealso \code{\link{LangmuirModel}}
 #' @export
 LangmuirModel<-function(kon,
-						koff, sd,
+						koff, sd=0,
 						analyteConcentrations,
 						Rmax,#="numeric", 
 					   associationLength,#="numeric", #option
@@ -550,8 +552,8 @@ setClass("InducedFitModel",
 					   R02="numeric"
 					   ),
 		prototype(BaseModel=NULL,
-					   kf=-1,
-					   kr=-1,
+					   kf=NULL,
+					   kr=NULL,
 					   R02=numeric()  #this R02 is used to for running dissociation, if we want the R0_AB_star, the stabler format of the complex
 				)	   
 		)
@@ -571,12 +573,12 @@ setMethod("CheckModelValidity", c("object"="InducedFitModel"),
 						return("BaseModel is not set correctly") 
 					}
 				
-				if(object@kf<0){
+				if(is.null(object@kf)){
 					return("kf is not set correctly")
 					#return(FALSE)
 				}
 				
-				if(object@kr<0)
+				if(is.null(object@kr))
 				{
 					return("koff is not set correctly")
 					#return(FALSE)
@@ -607,7 +609,7 @@ setValidity("InducedFitModel",
 #'@seealso \code{\link{InducedFitModel-class}}
 #' @export		   
 InducedFitModel<-function(kon,
-				koff,kf, kr,
+				koff,kf, kr,sd=0,
 				analyteConcentrations,
 				Rmax,#="numeric", 
 			   associationLength,#="numeric", #option
@@ -617,7 +619,7 @@ InducedFitModel<-function(kon,
 			   offset=0 ###optional, might be used in the future
 			   )
 	{
-						lgm<-new("LangmuirModel", kon=kon,koff=koff, analyteConcentrations=analyteConcentrations,
+						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
 							R0=R0, offset=offset)
@@ -648,8 +650,8 @@ setClass("ConformationalSelectionModel",
 					   kr="numeric" #kd, reverse, for conformation phase
 					   ),
 		prototype(BaseModel=NULL,
-					   kf=-1,
-					   kr=-1
+					   kf=NULL,
+					   kr=NULL
 				)	   
 		)
 #'@describeIn CheckModelValidity check the validity of ConformationalSelectionMdoel
@@ -666,12 +668,12 @@ setMethod("CheckModelValidity", c("object"="ConformationalSelectionModel"),
 				{
 					return("BaseModel is not set correctly")
 				}
-				if(object@kf<0){
+				if(is.null(object@kf)){
 					return("kf is not set correctly")
 					#return(FALSE)
 				}
 				
-				if(object@kr<0)
+				if(is.null(object@kr))
 				{
 					return("koff is not set correctly")
 					#return(FALSE)
@@ -688,7 +690,7 @@ setValidity("ConformationalSelectionModel",
 #'@seealso \code{\link{ConformatinalSelectionModel-class}}
 #' @export		   
 ConformationalSelectionModel<-function(kon,
-				koff,kf, kr,
+				koff,kf, kr,sd=0,
 				analyteConcentrations,
 				Rmax,#="numeric", 
 			   associationLength,#="numeric", #option
@@ -698,7 +700,7 @@ ConformationalSelectionModel<-function(kon,
 			   offset=0 ###optional, might be used in the future
 			   )
 	{
-						lgm<-new("LangmuirModel", kon=kon,koff=koff, analyteConcentrations=analyteConcentrations,
+						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd,analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
 							R0=R0, offset=offset)
@@ -777,7 +779,7 @@ setValidity("TwoStateModel",
 #'
 #'@seealso \code{\link{TwoStateModel-class}}
 #' @export		   
-TwoStateModel<-function(kon, koff, kf, sd, kr,#for induced fit model
+TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 				kon2,koff2, kf2,kr2, #for conformational selection model
 				analyteConcentrations,
 				Rmax,#="numeric", 
