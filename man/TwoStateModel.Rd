@@ -4,9 +4,9 @@
 \alias{TwoStateModel}
 \title{Constructor for \code{TwoStateModel}}
 \usage{
-TwoStateModel(kon, koff, kf, kr, kon2, koff2, kf2, kr2, analyteConcentrations,
-  Rmax, associationLength, dissociationLength, R0 = numeric(),
-  R02 = numeric(), offset = 0)
+TwoStateModel(kon, koff, kf, sd = 0, kr, kon2, koff2, kf2, kr2,
+  analyteConcentrations, Rmax, associationLength, dissociationLength,
+  R0 = numeric(), R02 = numeric(), offset = 0)
 }
 \seealso{
 \code{\link{TwoStateModel-class}}

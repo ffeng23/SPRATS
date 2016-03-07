@@ -9,15 +9,17 @@
 \alias{Simulate,TwoStateModel-method}
 \title{S4 Geric method to Simluate SPR data}
 \usage{
-Simulate(x, sampleFreq = 0.01, ...)
+Simulate(x, sampleFreq = 0.01, sd = 0, ...)
 
-\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01)
+\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01, sd = 0)
 
-\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01)
+\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01, sd = 0)
 
-\S4method{Simulate}{ConformationalSelectionModel}(x, sampleFreq = 0.01)
+\S4method{Simulate}{ConformationalSelectionModel}(x, sampleFreq = 0.01,
+  sd = 0)
 
-\S4method{Simulate}{TwoStateModel}(x, sampleFreq = 0.01, timeStep = 0.01)
+\S4method{Simulate}{TwoStateModel}(x, sampleFreq = 0.01, timeStep = 0.01,
+  sd = 0)
 }
 \arguments{
 \item{sampleFreq}{numeric the time frequency to collect the SPR data}
