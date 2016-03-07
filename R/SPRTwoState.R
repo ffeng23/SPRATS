@@ -1,15 +1,4 @@
-#####SPRTwoState package for analyzing and simulating SPR data
-#  this R package is used to do the analysis under the general 
-#  two model, especially for antigen and antibody interactions
-#  
-#  Version 0.1
-#  For now, 1)it will only fit the unified two state model
-#  2)It could also generalized the two state model for 
-#    multiple conformations of antibodies
-#  3) assume only antibodies (ligands) have multiple conformations, but
-#     not antigens (analytes).
-#
-#### Developed By Feng @ BU 2016. All right reserved###
+
 
 # @import MASS
 #NULL
@@ -51,6 +40,17 @@
 #' @slot steadyStateEnd numeric
 #' @slot offset numeric
 #' @seealso \code{\link{ReadSensorgramData}} \code{\link{GetObservedRUs}} \code{\link{SaveSPRData}}
+#' @examples
+#'		dt<-new("SensorgramData",
+#'		dissociationData=data.frame(time=1:5,RU=1:5, time2=1:5, RU=1:5))
+#'		dt@associationData
+#'
+#'		dataFile<-list.files(system.file("extdata", package="SPRATS"),
+#'		 pattern = "CBSInhibitor_raw.txt", full.names=TRUE) 
+#'		rawData<-ReadSensorgramData(dataFile, skip=4, 
+#'		header=T, sep="\t", associationPhaseEnd=80, dissociationPhaseEnd=150)
+#'
+#'		plot(rawData)
 #' @export
 setClass( "SensorgramData",
 		representation(associationData="data.frame",

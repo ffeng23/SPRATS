@@ -4,8 +4,8 @@
 \alias{ConformationalSelectionModel}
 \title{Constructor for \code{ConformationalSelectionModel}}
 \usage{
-ConformationalSelectionModel(kon, koff, kf, kr, analyteConcentrations, Rmax,
-  associationLength, dissociationLength, R0 = numeric(), offset = 0)
+ConformationalSelectionModel(kon, koff, kf, kr, sd = 0, analyteConcentrations,
+  Rmax, associationLength, dissociationLength, R0 = numeric(), offset = 0)
 }
 \seealso{
 \code{\link{ConformatinalSelectionModel-class}}

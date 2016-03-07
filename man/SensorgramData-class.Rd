@@ -53,6 +53,18 @@ It contains different slots for holding both association and
 
 \item{\code{offset}}{numeric}
 }}
+\examples{
+	dt<-new("SensorgramData",
+	dissociationData=data.frame(time=1:5,RU=1:5, time2=1:5, RU=1:5))
+	dt@associationData
+
+	dataFile<-list.files(system.file("extdata", package="SPRATS"),
+	 pattern = "CBSInhibitor_raw.txt", full.names=TRUE) 
+	rawData<-ReadSensorgramData(dataFile, skip=4, 
+	header=T, sep="\\t", associationPhaseEnd=80, dissociationPhaseEnd=150)
+
+	plot(rawData)
+}
 \seealso{
 \code{\link{ReadSensorgramData}} \code{\link{GetObservedRUs}} \code{\link{SaveSPRData}}
 }
