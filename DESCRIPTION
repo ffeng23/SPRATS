@@ -15,3 +15,6 @@ Imports:
     MASS
 URL: https://github.com/ffeng23/SPRATS.git
 RoxygenNote: 5.0.1
+Collate:
+    'SPRTwoState.R'
+    'SPRATS.R'
