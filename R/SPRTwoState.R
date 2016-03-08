@@ -340,8 +340,9 @@ GetObservedRUs<-function(DATA1, DATA2)
 		dt_RUs<-DATA1
 		for(i in 1:length(DATA1@analyteConcentrations))
 		{
-			dt_RUs@associationData[,i*2]<-DATA1@associationData[,i*2]+DATA2@associationData[,i*2]+noise1
-			dt_RUs@dissociationData[,i*2]<-DATA1@dissociationData[,i*2]+DATA2@dissociationData[,i*2]+noise2
+		  #Noise added to RU observed
+			dt_RUs@associationData[,i*2]<-DATA1@associationData[,i*2]+DATA2@associationData[,i*2]
+			dt_RUs@dissociationData[,i*2]<-DATA1@dissociationData[,i*2]+DATA2@dissociationData[,i*2]
 		}
 		dt_RUs
 	}
@@ -409,8 +410,8 @@ SaveSPRData<-function(DATA, file, sep="\t")
 #'@slot koff numeric dissociation rate constant
 #'@slot analyteConcentrations numeric vector for different
 #'		analyte concentrations.
-#'@slot sd numeric standard deviation of the Gaussian noise. 
-#'		by default sd=0, which there is no noise.
+#'@slot s_d numeric standard deviation of the Gaussian noise. 
+#'		by default s_d=0, which there is no noise.
 #'@slot Rmax numeric the maximum RUs levels at the infinite
 #'		high analyte concentration.
 #'@slot associationLength numeric the time period to run the association
@@ -427,7 +428,7 @@ SaveSPRData<-function(DATA, file, sep="\t")
 setClass("LangmuirModel",
 		representation(kon="numeric",
 					   koff="numeric",
-					   sd="numeric",
+					   s_d="numeric",
 					   analyteConcentrations="numeric", #vector
 					   Rmax="numeric", 
 					   associationLength="numeric", #option
@@ -437,7 +438,7 @@ setClass("LangmuirModel",
 		               ),
 		prototype(kon=NULL,
 					   koff=NULL,
-					   sd=0,
+					   s_d=0,
 					   analyteConcentrations=numeric(), #vector
 					   Rmax=NULL, 
 					   associationLength=NULL,
@@ -476,7 +477,7 @@ setMethod("CheckModelValidity", c("object"="LangmuirModel"),
 					cat("koff is not set correctly\n")
 					return(FALSE)
 				}
-		    #if(is.null(object@sd))
+		    #if(is.null(object@s_d))
 		    #{
 		    #  cat("Standard deviation is not set correctly\n")
 		    #  return(FALSE)
@@ -526,7 +527,7 @@ setValidity("LangmuirModel",
 #'@seealso \code{\link{LangmuirModel}}
 #' @export
 LangmuirModel<-function(kon,
-						koff, sd=0,
+						koff, s_d=0,
 						analyteConcentrations,
 						Rmax,#="numeric", 
 					   associationLength,#="numeric", #option
@@ -535,7 +536,7 @@ LangmuirModel<-function(kon,
 					   offset=0 ###optional, might be used in the future
 					   )
 	{
-						new("LangmuirModel", kon=kon, koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
+						new("LangmuirModel", kon=kon, koff=koff, s_d=s_d, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
 							R0=R0, offset=offset)
@@ -623,7 +624,7 @@ setValidity("InducedFitModel",
 #'@seealso \code{\link{InducedFitModel-class}}
 #' @export		   
 InducedFitModel<-function(kon,
-				koff,kf, kr,sd=0,
+				koff,kf, kr,s_d=0,
 				analyteConcentrations,
 				Rmax,#="numeric", 
 			   associationLength,#="numeric", #option
@@ -633,7 +634,7 @@ InducedFitModel<-function(kon,
 			   offset=0 ###optional, might be used in the future
 			   )
 	{
-						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
+						lgm<-new("LangmuirModel", kon=kon,koff=koff, s_d=s_d, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
 							R0=R0, offset=offset)
@@ -704,7 +705,7 @@ setValidity("ConformationalSelectionModel",
 #'@seealso \code{\link{ConformatinalSelectionModel-class}}
 #' @export		   
 ConformationalSelectionModel<-function(kon,
-				koff,kf, kr,sd=0,
+				koff,kf, kr,s_d=0,
 				analyteConcentrations,
 				Rmax,#="numeric", 
 			   associationLength,#="numeric", #option
@@ -714,7 +715,7 @@ ConformationalSelectionModel<-function(kon,
 			   offset=0 ###optional, might be used in the future
 			   )
 	{
-						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd,analyteConcentrations=analyteConcentrations,
+						lgm<-new("LangmuirModel", kon=kon,koff=koff, s_d=s_d, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
 							R0=R0, offset=offset)
@@ -793,7 +794,7 @@ setValidity("TwoStateModel",
 #'
 #'@seealso \code{\link{TwoStateModel-class}}
 #' @export		   
-TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
+TwoStateModel<-function(kon, koff, kf, s_d=0, kr,#for induced fit model
 				kon2,koff2, kf2,kr2, #for conformational selection model
 				analyteConcentrations,
 				Rmax,#="numeric", 
@@ -804,13 +805,13 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 			   offset=0 ###optional, might be used in the future
 			   )
 	{
-		lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
+		lgm<-new("LangmuirModel", kon=kon,koff=koff, s_d=s_d, analyteConcentrations=analyteConcentrations,
 			Rmax=Rmax,
 			associationLength=associationLength, dissociationLength=dissociationLength,
 			R0=R0, offset=offset)
 		lgIF<-new("InducedFitModel", BaseModel=lgm, kf=kf, kr=kr, R02=R02)
 
-		lgm2<-new("LangmuirModel", kon=kon2,koff=koff2, sd=sd, analyteConcentrations=analyteConcentrations,
+		lgm2<-new("LangmuirModel", kon=kon2,koff=koff2, s_d=s_d, analyteConcentrations=analyteConcentrations,
 			Rmax=Rmax,
 			associationLength=associationLength, dissociationLength=dissociationLength,
 			R0=R0, offset=offset)
@@ -841,10 +842,10 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 #'			\code{\link{SensorgramData-class}}
 #' @export		   
 setGeneric("Simulate", signature="x",
-			function(x, sampleFreq=0.01, sd=0, ...) standardGeneric("Simulate"))
+			function(x, sampleFreq=0.01, s_d=0, ...) standardGeneric("Simulate"))
 #'@describeIn Simulate to simulate the SPR data based on a Langmuir Model
-setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
-		function(x,sampleFreq=0.01,sd=0)
+setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="numeric),
+		function(x,sampleFreq=0.01,s_d=0)
 		{##running the analytical solution of langmuirModel
 			#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -863,10 +864,11 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 				x_Ass<-data.frame();
 				x_Ass_A<-data.frame();
 				x_time<-seq(0,x@associationLength,by=sampleFreq)
+
 				for(i in c(1:length(x@analyteConcentrations)))
 				{
 					temp<-x@Rmax*x@analyteConcentrations[i]/(x@koff/x@kon+x@analyteConcentrations[i])*(1-exp(-1*x_time*(x@kon*x@analyteConcentrations[i]+x@koff)))
-					noise1<-rnorm(length(x_time),0,sd)
+					noise1<-rnorm(length(x_time),0,s_d)
 					if(i==1)
 					{
 						x_Ass<-data.frame(Time=x_time, RU1=temp)
@@ -878,8 +880,9 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=x@Rmax-temp))
 					}
 				}
-				x_sgd@associationData<-x_Ass
+				x_sgd@associationData<-x_Ass+noise1
 				x_sgd_A@associationData<-x_Ass_A
+				
 			}#end of association
 			#cat("Simulating dissociation phase......\n")
 			#print(x_sgd@associationData)
@@ -888,10 +891,11 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 				x_Diss<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@dissociationLength,by=sampleFreq)
-								
+				
 				for(i in c(1:length(x@analyteConcentrations)))
 				{
 					x_R0<-0;
+					
 					if(length(x@R0)!=0)
 					{
 						x_R0<-x@R0[i]
@@ -905,7 +909,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 					x_R0<-x_R0+x@offset
 					
 					temp<-x_R0*exp(-1*x_time*x@koff)
-					noise2<-rnorm(length(x_time),0,sd)
+					noise2<-rnorm(length(x_time),0,s_d)
 					
 					if(i==1)
 					{
@@ -919,17 +923,18 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 					}
 				}
 				
-				x_sgd@dissociationData<-x_Diss
+				x_sgd@dissociationData<-x_Diss+noise2
 				x_sgd_A@dissociationData<-x_Diss_A
 			}
 			x_sgd@analyteConcentrations<-x@analyteConcentrations
 			x_sgd_A@analyteConcentrations<-x@analyteConcentrations
+
 			return(list(R_AB=x_sgd,R_A=x_sgd_A))
 		}#end of function
 	)
 #'@describeIn Simulate to simulate the SPR data based on a InducedFit Model
 setMethod("Simulate", c("x"="InducedFitModel"),
-		function(x,sampleFreq=0.01,sd=0)
+		function(x,sampleFreq=0.01,s_d=0)
 		{##running the analytical solution of langmuirModel
 			#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -942,7 +947,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 			kd1<-x@BaseModel@koff
 			ka2<-x@kf
 			kd2<-x@kr
-			sd<-x@BaseModel@sd
+			s_d<-x@BaseModel@s_d
 			Rmax<-x@BaseModel@Rmax
 			x_sgd<-new("SensorgramData") #unstable AB
 			x_sgd_AB_star<-new("SensorgramData") #stable AB
@@ -956,6 +961,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				x_Ass_AB_star<-data.frame();
 				x_Ass_A<-data.frame()
 				x_time<-seq(0,x@BaseModel@associationLength,by=sampleFreq)
+				noise1<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -973,8 +979,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 					E<-E_bar+A*exp(-1*r1*x_time)+B*exp(-1*r2*x_time);
 					ES_star<-ES_star_bar+1/kd1*(r1-(ka1*conc+kd1))*A*exp(-1*r1*x_time)+1/kd1*(r2-(ka1*conc+kd1))*B*exp(-1*r2*x_time);
 					ES<-Rmax-E-ES_star
-					noise1<-rnorm(length(x_time),0,sd)
-					
+
 			
 					if(i==1)
 					{
@@ -990,7 +995,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 					}
 				}
 				x_sgd@associationData<-x_Ass
-				x_sgd_AB_star@associationData<-x_Ass_AB_star
+				x_sgd_AB_star@associationData<-x_Ass_AB_star+noise1
 				x_sgd_A@associationData<-x_Ass_A
 				
 			}#end of association
@@ -1002,13 +1007,13 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				x_Diss_AB_star<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@dissociationLength,by=sampleFreq)
-								
+				noise2<-rnorm(length(x_time),0,s_d)
+				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
 					x_R0<-0;
 					X_R0_star<-0
-					noise2<-rnorm(length(x_time),0,sd)
-					
+
 					if(length(x@BaseModel@R0)!=0)
 					{
 						x_R0<-x@BaseModel@R0[i]
@@ -1052,7 +1057,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				}
 				
 				x_sgd@dissociationData<-x_Diss
-				x_sgd_AB_star@dissociationData<-x_Diss_AB_star
+				x_sgd_AB_star@dissociationData<-x_Diss_AB_star+noise2
 				x_sgd_A@dissociationData<-x_Diss_A
 			}
 			x_sgd@analyteConcentrations<-x@BaseModel@analyteConcentrations
@@ -1076,7 +1081,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 #'   save nothing in A_star (no dissociation data).
 #'	Note: this part is a bit confusing. Need more work in the future.
 setMethod("Simulate", c("x"="ConformationalSelectionModel"),
-		function(x, sampleFreq=0.01, sd=0)
+		function(x, sampleFreq=0.01, s_d=0)
 		{
 				#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -1089,6 +1094,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 			kd1<-x@BaseModel@koff
 			ka2<-x@kf
 			kd2<-x@kr
+			s_d<-x@BaseModel@s_d
 			Rmax<-x@BaseModel@Rmax
 			x_sgd<-new("SensorgramData") #stable AB
 			x_sgd_A_star<-new("SensorgramData") #stable A
@@ -1101,6 +1107,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 				x_Ass_A_star<-data.frame();
 				x_Ass_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@associationLength,by=sampleFreq)
+				noise1<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -1112,7 +1119,6 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 					h<-r1-r2;
 					D1<--1*ka2*ka1*conc*kd2*Rmax*r2/(p*m*h);
 					D2<-ka2*kd2*ka1*conc*Rmax*r1/(p*m*h);
-					noise1<-rnorm(length(x_time),0,sd);
 
 					A_bar<-Rmax*kd1*kd2/p
 					#A_star_bar<-Rmax*ka2*kd1/p
@@ -1139,7 +1145,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=A))
 					}
 				}
-				x_sgd@associationData<-x_Ass
+				x_sgd@associationData<-x_Ass+noise1
 				x_sgd_A_star@associationData<-x_Ass_A_star
 				x_sgd_A@associationData<-x_Ass_A
 				
@@ -1152,13 +1158,13 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 				#x_Diss_A_star<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@dissociationLength,by=sampleFreq)
-								
+				noise2<-rnorm(length(x_time),0,s_d)
+				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
 					x_R0<-0;
 					X_R0_star<-0
-					noise2<-rnorm(length(x_time),0,sd)
-					
+
 					if(length(x@BaseModel@R0)!=0)
 					{
 						x_R0<-x@BaseModel@R0[i]
@@ -1183,12 +1189,12 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 					{
 						x_Diss<-data.frame(Time=x_time, RU1=ES)
 						x_Diss_A<-data.frame(Time=x_time, RU1=E_total)
-						#x_Diss_A<-data.frame(Time=x_time, RU1=E)
+						#x_Diss_A_star<-data.frame(Time=x_time, RU1=E)
 					}
 					else
 					{
 						x_Diss<-cbind(x_Diss,data.frame(Time=x_time, RU1=ES))
-						#x_Diss_AB_star<-cbind(x_Diss,data.frame(Time=x_time, RU1=ES_star))
+						#x_Diss_A_star<-cbind(x_Diss,data.frame(Time=x_time, RU1=ES_star))
 						x_Diss_A<-cbind(x_Diss_A,data.frame(Time=x_time, RU1=E_total))
 					}
 				}
@@ -1205,7 +1211,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 	)
 #'@describeIn Simulate to simulate the SPR data based on a TwoState Model
 setMethod("Simulate", c("x"="TwoStateModel"),
-		function(x, sampleFreq=0.01, timeStep=0.01, sd=0)
+		function(x, sampleFreq=0.01, timeStep=0.01, s_d=0)
 		{
 			#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -1252,8 +1258,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 				for(i in c(1:length(x@BaseModel1@BaseModel@analyteConcentrations)))
 				{
 					conc<-x@BaseModel1@BaseModel@analyteConcentrations[i]
-					noise1<-rnorm(length(x_time),0,sd)
-					
+
 					#cat("i:", i,"\n")
 					#cat("length of AB:", length(AB),"\n")
 					#cat("length of Rmax:", length(Rmax), "\n")
@@ -1333,8 +1338,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 								
 				for(i in c(1:length(x@BaseModel1@BaseModel@analyteConcentrations)))
 				{
-				  noise2<-rnorm(length(x_time),0,sd)
-				  
+
 				  ru_detach_AB<-x_time;
 					ru_detach_AB_star<-x_time
 					ru_detach_AB[1]<-x_sgd@associationData[length(x_sgd@associationData[,1]),i*2];
