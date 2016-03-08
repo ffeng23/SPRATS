@@ -4,8 +4,8 @@
 \alias{LangmuirModel}
 \title{Constructor for LangmuirModel}
 \usage{
-LangmuirModel(kon, koff, analyteConcentrations, Rmax, associationLength,
-  dissociationLength, R0 = numeric(), offset = 0)
+LangmuirModel(kon, koff, sd = 0, analyteConcentrations, Rmax,
+  associationLength, dissociationLength, R0 = numeric(), offset = 0)
 }
 \seealso{
 \code{\link{LangmuirModel}}

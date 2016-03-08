@@ -1,0 +1,46 @@
+#code to run R package
+#namespace to import export
+#example for each methods
+
+#define
+projectPath<-"e:/feng/LAB/hg/SPR_models/SPRATS"
+
+holderPath<-"e:/feng/LAB/hg/SPR_models"
+
+#feng's directory
+setwd( "e:/feng/LAB/hg/SPR_models")
+#to create new R package, with new folder created using the name fields
+package.skeleton(name = "SPRATS",
+                 code_files = "TwoState.R") 
+#same thing as skeleton				 
+devtools:create(path="SPRATS" )
+#same thing as skeleton, but use the current folder, and assume the package name as the current folder name
+devtools::setup(path=".")				 
+
+
+#call roxygen2 to process the helper pages from the roxygen comments
+setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
+devtools::document()
+
+#remove
+remove.packages("SPRATS")
+
+#feng's directory to call to install
+setwd( "e:/feng/LAB/hg/SPR_models")
+#install from local directory, but this is different from install.packages
+devtools::install("SPRATS")
+
+#install from local using install.packages utility
+setwd( "e:/feng/LAB/hg/SPR_models")
+install.packages(c("SPRATS"),repos=NULL, type="source")
+
+#load the package
+library(SPRATS)
+
+#call to show the man page of the class.
+?"SensorgramData-class"
+
+#prepare the raw data
+dataPath<-paste(holderPath,"/SPRTwoStatePackage/CBSInhibitor_140313Run_5E-5ConcChanel1_raw.txt",sep="")
+rawDataPath<-paste(projectPath,"/inst/extdata/CBSInhibitor_raw.txt",sep="")
+file.copy(dataPath, rawDataPath)
