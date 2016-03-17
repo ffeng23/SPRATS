@@ -242,7 +242,7 @@ setMethod("plot", "SensorgramData",
 			#cat("lty:",lty,"\n")
 			max_x1<-0;
 			max_x2<-0;
-			max_y1<-0
+			max_y1<-0;
 			max_y2<-0;
 			meanRUs<-rep(0, length(x@associationData)/2)
 			for(i in 1:(length(x@associationData)/2))
@@ -340,7 +340,6 @@ GetObservedRUs<-function(DATA1, DATA2)
 		dt_RUs<-DATA1
 		for(i in 1:length(DATA1@analyteConcentrations))
 		{
-		  #Noise added to RU observed
 			dt_RUs@associationData[,i*2]<-DATA1@associationData[,i*2]+DATA2@associationData[,i*2]
 			dt_RUs@dissociationData[,i*2]<-DATA1@dissociationData[,i*2]+DATA2@dissociationData[,i*2]
 		}
@@ -864,11 +863,11 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="n
 				x_Ass<-data.frame();
 				x_Ass_A<-data.frame();
 				x_time<-seq(0,x@associationLength,by=sampleFreq)
+				noise<-rnorm(length(x_time),0,s_d)
 
 				for(i in c(1:length(x@analyteConcentrations)))
 				{
 					temp<-x@Rmax*x@analyteConcentrations[i]/(x@koff/x@kon+x@analyteConcentrations[i])*(1-exp(-1*x_time*(x@kon*x@analyteConcentrations[i]+x@koff)))
-					noise1<-rnorm(length(x_time),0,s_d)
 					if(i==1)
 					{
 						x_Ass<-data.frame(Time=x_time, RU1=temp)
@@ -880,7 +879,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="n
 						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=x@Rmax-temp))
 					}
 				}
-				x_sgd@associationData<-x_Ass+noise1
+				x_sgd@associationData<-x_Ass+noise
 				x_sgd_A@associationData<-x_Ass_A
 				
 			}#end of association
@@ -891,6 +890,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="n
 				x_Diss<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@dissociationLength,by=sampleFreq)
+				noise<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@analyteConcentrations)))
 				{
@@ -909,8 +909,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="n
 					x_R0<-x_R0+x@offset
 					
 					temp<-x_R0*exp(-1*x_time*x@koff)
-					noise2<-rnorm(length(x_time),0,s_d)
-					
+
 					if(i==1)
 					{
 						x_Diss<-data.frame(Time=x_time, RU1=temp)
@@ -923,7 +922,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric", "s_d"="n
 					}
 				}
 				
-				x_sgd@dissociationData<-x_Diss+noise2
+				x_sgd@dissociationData<-x_Diss+noise
 				x_sgd_A@dissociationData<-x_Diss_A
 			}
 			x_sgd@analyteConcentrations<-x@analyteConcentrations
@@ -961,7 +960,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				x_Ass_AB_star<-data.frame();
 				x_Ass_A<-data.frame()
 				x_time<-seq(0,x@BaseModel@associationLength,by=sampleFreq)
-				noise1<-rnorm(length(x_time),0,s_d)
+				noise<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -995,7 +994,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 					}
 				}
 				x_sgd@associationData<-x_Ass
-				x_sgd_AB_star@associationData<-x_Ass_AB_star+noise1
+				x_sgd_AB_star@associationData<-x_Ass_AB_star+noise
 				x_sgd_A@associationData<-x_Ass_A
 				
 			}#end of association
@@ -1007,7 +1006,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				x_Diss_AB_star<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@dissociationLength,by=sampleFreq)
-				noise2<-rnorm(length(x_time),0,s_d)
+				noise<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -1057,7 +1056,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				}
 				
 				x_sgd@dissociationData<-x_Diss
-				x_sgd_AB_star@dissociationData<-x_Diss_AB_star+noise2
+				x_sgd_AB_star@dissociationData<-x_Diss_AB_star+noise
 				x_sgd_A@dissociationData<-x_Diss_A
 			}
 			x_sgd@analyteConcentrations<-x@BaseModel@analyteConcentrations
@@ -1107,7 +1106,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 				x_Ass_A_star<-data.frame();
 				x_Ass_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@associationLength,by=sampleFreq)
-				noise1<-rnorm(length(x_time),0,s_d)
+				noise<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -1145,7 +1144,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=A))
 					}
 				}
-				x_sgd@associationData<-x_Ass+noise1
+				x_sgd@associationData<-x_Ass+noise
 				x_sgd_A_star@associationData<-x_Ass_A_star
 				x_sgd_A@associationData<-x_Ass_A
 				
@@ -1158,7 +1157,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 				#x_Diss_A_star<-data.frame();
 				x_Diss_A<-data.frame();
 				x_time<-seq(0,x@BaseModel@dissociationLength,by=sampleFreq)
-				noise2<-rnorm(length(x_time),0,s_d)
+				noise<-rnorm(length(x_time),0,s_d)
 				
 				for(i in c(1:length(x@BaseModel@analyteConcentrations)))
 				{
@@ -1199,7 +1198,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 					}
 				}
 				
-				x_sgd@dissociationData<-x_Diss
+				x_sgd@dissociationData<-x_Diss+noise
 				x_sgd_A_star@dissociationData<-data.frame();
 				x_sgd_A@dissociationData<-x_Diss_A
 			}
@@ -1254,6 +1253,8 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 				x_Ass_A_star<-data.frame();
 				x_Ass_A<-data.frame();
 				x_time<-seq(0,x@BaseModel1@BaseModel@associationLength,by=timeStep)
+				noise<-rnorm(length(x_time),0,s_d)
+			
 				#cat("simulating assocation phase.......\n")
 				for(i in c(1:length(x@BaseModel1@BaseModel@analyteConcentrations)))
 				{
@@ -1335,6 +1336,8 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 				x_Diss_A<-data.frame();
 				x_Diss_A_star<-data.frame();
 				x_time<-seq(0,x@BaseModel1@BaseModel@dissociationLength,by=timeStep)
+				noise<-rnorm(length(x_time),0,s_d)
+				
 								
 				for(i in c(1:length(x@BaseModel1@BaseModel@analyteConcentrations)))
 				{
@@ -1398,7 +1401,6 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 			
 			return(list(AB=x_sgd, AB_star=x_sgd_AB_star, A=x_sgd_A, A_star=x_sgd_A_star))
 		}
-	)
 
 	####now we can do the fitting.
 	#mode, indicating what model will be used 
