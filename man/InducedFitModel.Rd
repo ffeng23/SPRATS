@@ -4,9 +4,9 @@
 \alias{InducedFitModel}
 \title{Constructor for \code{InducedFitModel}}
 \usage{
-InducedFitModel(kon, koff, kf, kr, sd = 0, analyteConcentrations, Rmax,
+InducedFitModel(kon, koff, kf, kr, s_d = 0, analyteConcentrations, Rmax,
   associationLength, dissociationLength, R0 = numeric(), R02 = numeric(),
-  offset = 0)
+  offset = 0, Rligand = "numeric", efficiency = "numeric")
 }
 \seealso{
 \code{\link{InducedFitModel-class}}

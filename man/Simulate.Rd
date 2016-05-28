@@ -7,35 +7,53 @@
 \alias{Simulate,InducedFitModel-method}
 \alias{Simulate,LangmuirModel-method}
 \alias{Simulate,TwoStateModel-method}
-\title{S4 Geric method to Simluate SPR data}
+\title{S4 Generic method to Simulate SPR data}
 \usage{
-Simulate(x, sampleFreq = 0.01, sd = 0, ...)
+Simulate(x, sampleFreq = 0.01, sd = 0, fix.ligand = TRUE, ...)
 
-\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01, sd = 0)
+\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01, sd = 0,
+  fix.ligand = TRUE)
 
-\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01, sd = 0)
+\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01, sd = 0,
+  fix.ligand = TRUE)
 
 \S4method{Simulate}{ConformationalSelectionModel}(x, sampleFreq = 0.01,
-  sd = 0)
+  sd = 0, fix.ligand = TRUE)
 
 \S4method{Simulate}{TwoStateModel}(x, sampleFreq = 0.01, timeStep = 0.01,
-  sd = 0)
+  sd = 0, fix.ligand = TRUE)
 }
 \arguments{
 \item{sampleFreq}{numeric the time frequency to collect the SPR data}
+
+\item{sd}{standard deviation used to simulate the nosiy data. 
+zero by default for non-noisy data}
+
+\item{timeStep}{numeric the time step used to run numerical simulation\cr
+This is only for the Two State model, since the other 3 models are analytical
+calculated.}
+
+\item{model}{currently only used for two different model for 
+Rmax: \cr1)model=1, fixed ligand immobilization model. Where Rmax is
+kept at a costant level for different run or different channel.
+only one Rmax is set through parameter "Rmax". 2)model=2,variable ligand
+immobilization model, where Rmax for each run/channel is not fixed
+and only "efficincy" is assumed to be constant. \cr if model 
+is set to be other values (not 1 or 2), fixed ligand model 
+assumed.}
 }
 \value{
 a list of \code{\link{SensorgramData-class}} data object 
 	holding the SPR data for different component in the system
 }
 \description{
-Geric method to run the simulatoin based on the model
+Generic method to run the simulation based on the model
 }
 \details{
-the each model has different biochemical dynamics to generate
+each model has different biochemical dynamics to generate
 	the data. The Langmuir, induced fit and conformational selection
-	models simulate data analytically, but the two state model simulate
-	through numerical integration. Please check the detail here
+	models simulate data analytically, but the two state model simulates
+	through numerical integration. Please check the details here
 	\url{http://}
 
 the output is the sensorgram data for AB, A and A_star

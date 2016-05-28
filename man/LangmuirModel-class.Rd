@@ -21,11 +21,12 @@ check the manual for the detailed model specifications
 \item{\code{analyteConcentrations}}{numeric vector for different
 analyte concentrations.}
 
-\item{\code{sd}}{numeric standard deviation of the Gaussian noise. 
-by default sd=0, which there is no noise.}
+\item{\code{s_d}}{numeric standard deviation of the Gaussian noise. 
+by default s_d=0, which there is no noise.}
 
 \item{\code{Rmax}}{numeric the maximum RUs levels at the infinite
-high analyte concentration.}
+high analyte concentration. It is also the maximum level
+of ligand immobilized on the chip surface \cr}
 
 \item{\code{associationLength}}{numeric the time period to run the association}
 
@@ -36,6 +37,20 @@ optional}
 
 \item{\code{offset}}{the level shifted at the begining of the dissociation phase
 optional}
+
+\item{\code{Rligand}}{the levels of ligand immobilized on the chip surface. 
+optional\cr
+If this one is set, then it assumes a variable "Rmax" model. Where 
+Rmax for different run is not fixed but rather different due to 
+some factors
+such as regeration in (Sensiq) or stochasticity (in BioRad Proteon). 
+In this model, the immoblized ligand is not fixed from run to run,
+but the effienciency or conversion constant is fixed.\cr
+This is a vector contains same number of element as the analyteConc.}
+
+\item{\code{efficiency}}{the conversion constant for a "variable" Rmax model 
+optional\cr
+see above for explanation.}
 }}
 \seealso{
 \code{\link{ConformationalSelectionModel-class}}

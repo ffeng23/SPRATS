@@ -18,13 +18,14 @@ devtools:create(path="SPRATS" )
 devtools::setup(path=".")				 
 
 
-#call roxygen2 to process the helper pages from the roxygen comments
-setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
-devtools::document()
+
 
 #remove
 remove.packages("SPRATS")
 
+#call roxygen2 to process the helper pages from the roxygen comments
+setwd( "e:/feng/LAB/hg/SPR_models/SPRATS")
+devtools::document()
 #feng's directory to call to install
 setwd( "e:/feng/LAB/hg/SPR_models")
 #install from local directory, but this is different from install.packages
