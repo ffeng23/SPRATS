@@ -5,7 +5,8 @@
 \title{Constructor for \code{ConformationalSelectionModel}}
 \usage{
 ConformationalSelectionModel(kon, koff, kf, kr, sd = 0, analyteConcentrations,
-  Rmax, associationLength, dissociationLength, R0 = numeric(), offset = 0)
+  Rmax, associationLength, dissociationLength, R0 = numeric(), offset = 0,
+  Rligand = "numeric", efficiency = "numeric")
 }
 \seealso{
 \code{\link{ConformatinalSelectionModel-class}}

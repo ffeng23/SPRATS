@@ -7,7 +7,7 @@
 FitTwoStateSPR(x, mode = 1, type = 1, steadyStateStart = -1,
   steadyStateEnd = -1, windowSize = 10, init.association = NULL,
   init.dissociation = NULL, control = list(maxiter = 500, tol = 0.01,
-  minFactor = 1/1e+10), trace = F)
+  minFactor = 1/1e+10), trace = F, fix.ligand = TRUE, Rligand = NULL)
 }
 \arguments{
 \item{x}{SensorgramData containing the data to be fitted}
@@ -19,8 +19,8 @@ nonlinear regression is better}
 
 \item{type}{integer to indicate which type of analysis in dissociation
     phase to be used. 
-1. for two state do fitting and then regression. 
-2. for multi-state approximation}
+1. for multi-state approximation
+2. for two state do fitting and then regression.}
 
 \item{steadyStateStart}{numeric the starting time for steady state
 optional and if provided, will overwrite the one in sensorgramdata}
@@ -44,6 +44,16 @@ list(R1=20, R2=200,r1=-0.005,r2=-0.001)}
 
 \item{trace}{boolean to control whether show the trace of
 nonlinear regression.}
+
+\item{fix.ligand}{a boolean indicating which ligand immoblization
+model is using. \cr
+TRUE, the fixed ligand immobilzation model. Rmax is used\cr
+    FALSE, the variable ligand immbolization model. Rligand 
+and efficiency are used. See also \code{\link{LangmuirModel-class}}}
+
+\item{Rligand}{the input for the variable immobilization levels of 
+ligands on the chip. This is used by the variable ligand 
+immbolization model.See also \code{\link{LangmuirModel-class}}}
 }
 \value{
 a list of parameters estimated

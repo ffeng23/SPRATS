@@ -398,13 +398,26 @@ SaveSPRData<-function(DATA, file, sep="\t")
 #'@slot sd numeric standard deviation of the Gaussian noise. 
 #'		by default sd=0, which there is no noise.
 #'@slot Rmax numeric the maximum RUs levels at the infinite
-#'		high analyte concentration.
+#'		high analyte concentration. It is also the maximum level
+#'		of ligand immobilized on the chip surface \cr
 #'@slot associationLength numeric the time period to run the association
 #'@slot dissociationLength numeric the time period to run the dissociation
 #'@slot R0 numeric vector the starting RUs for the dissocaiton phase.
 #'		optional
 #'@slot offset the level shifted at the begining of the dissociation phase
 #'		optional
+#'@slot Rligand the levels of ligand immobilized on the chip surface. 
+#'		optional\cr
+#'		If this one is set, then it assumes a variable "Rmax" model. Where 
+#'		Rmax for different run is not fixed but rather different due to 
+#'		some factors
+#'		such as regeration in (Sensiq) or stochasticity (in BioRad Proteon). 
+#'		In this model, the immoblized ligand is not fixed from run to run,
+#'		but the effienciency or conversion constant is fixed.\cr
+#'		This is a vector contains same number of element as the analyteConc.
+#'@slot efficiency the conversion constant for a "variable" Rmax model 
+#'		optional\cr
+#'		see above for explanation.
 #'@seealso \code{\link{ConformationalSelectionModel-class}}
 #'		\code{\link{TwoStateModel-class}}
 #'		\code{\link{InducedFitModel-class}}
@@ -419,7 +432,9 @@ setClass("LangmuirModel",
 					   associationLength="numeric", #option
 					   dissociationLength="numeric", #option
 					   R0="numeric",#vector optional, if not set the R0 will be getting values from the end of association phase
-					   offset="numeric" ###optional, might be used in the future
+					   offset="numeric", ###optional, might be used in the future
+					   Rligand="numeric", ###optional, only meaningful a variable Rmax model is assumed
+					   efficiency="numeric" ###optional, used in the above alternative model
 		               ),
 		prototype(kon=NULL,
 					   koff=NULL,
@@ -429,7 +444,9 @@ setClass("LangmuirModel",
 					   associationLength=NULL,
 					   dissociationLength=NULL,
 					   R0=numeric(),#optional, if not set the R0 will be getting values from the end of association phase
-					   offset=0 ###optional, might be used in the future
+					   offset=0, ###optional, might be used in the future
+					   Rligand=numeric(), ###optional, not set by default
+					   efficiency=1.0 ###same above, 1.0 by default (100% efficiency)
 				)	   
 		)
 #'@title S4 generic help function to check model validity
@@ -518,13 +535,17 @@ LangmuirModel<-function(kon,
 					   associationLength,#="numeric", #option
 					   dissociationLength,#="numeric", #option
 					   R0=numeric(),#vector optional, if not set the R0 will be getting values from the end of association phase
-					   offset=0 ###optional, might be used in the future
+					   offset=0, ###optional, might be used in the future
+					   Rligand=numeric, ###optional, only meaningful a variable Rmax model is assumed
+					   efficiency=1.0 ###optional, used in the above alternative model
 					   )
 	{
 						new("LangmuirModel", kon=kon, koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
-							R0=R0, offset=offset)
+							R0=R0, offset=offset,
+							Rligand=Rligand, efficiency=efficiency
+							)
 	}
 
 #induced fit
@@ -616,13 +637,16 @@ InducedFitModel<-function(kon,
 			   dissociationLength,#="numeric", #option
 			   R0=numeric(),#vector optional, if not set the R0 will be getting values from the end of association phase
 			   R02=numeric(),
-			   offset=0 ###optional, might be used in the future
+			   offset=0, ###optional, might be used in the future
+			   Rligand="numeric", ###optional, only meaningful a variable Rmax model is assumed
+				efficiency="numeric" ###optional, used in the above alternative model
 			   )
 	{
 						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
-							R0=R0, offset=offset)
+							R0=R0, offset=offset,
+							Rligand=Rligand, efficiency=efficiency)
 						new("InducedFitModel", BaseModel=lgm, kf=kf, kr=kr, R02=R02)
 	}
 #conformational selection
@@ -696,14 +720,16 @@ ConformationalSelectionModel<-function(kon,
 			   associationLength,#="numeric", #option
 			   dissociationLength,#="numeric", #option
 			   R0=numeric(),#vector optional, if not set the R0 will be getting values from the end of association phase
-			   
-			   offset=0 ###optional, might be used in the future
+			   offset=0, ###optional, might be used in the future
+			   Rligand="numeric", ###optional, only meaningful a variable Rmax model is assumed
+				efficiency="numeric" ###optional, used in the above alternative model
 			   )
 	{
 						lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd,analyteConcentrations=analyteConcentrations,
 							Rmax=Rmax,
 							associationLength=associationLength, dissociationLength=dissociationLength,
-							R0=R0, offset=offset)
+							R0=R0, offset=offset,
+							Rligand=Rligand, efficiency=efficiency)
 						new("ConformationalSelectionModel", BaseModel=lgm, kf=kf, kr=kr)
 	}		   
 #two state model
@@ -713,6 +739,8 @@ ConformationalSelectionModel<-function(kon,
 # concentration
 # R0
 # offset
+# Rligand
+# efficiency
 # from the inducedFitModel@LangmuirModel
 
 #'@title S4 class of the SPR Two State model
@@ -787,13 +815,16 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 			   dissociationLength,#="numeric", #option
 			   R0=numeric(),#vector optional, if not set the R0 will be getting values from the end of association phase
 			   R02=numeric(),#vector optional, if not set the R02 will be getting values from the end of association phase
-			   offset=0 ###optional, might be used in the future
+			   offset=0, ###optional, might be used in the future
+			   Rligand="numeric", ###optional, only meaningful a variable Rmax model is assumed
+				efficiency="numeric" ###optional, used in the above alternative model
 			   )
 	{
 		lgm<-new("LangmuirModel", kon=kon,koff=koff, sd=sd, analyteConcentrations=analyteConcentrations,
 			Rmax=Rmax,
 			associationLength=associationLength, dissociationLength=dissociationLength,
-			R0=R0, offset=offset)
+			R0=R0, offset=offset,
+			Rligand=Rligand, efficiency=efficiency)
 		lgIF<-new("InducedFitModel", BaseModel=lgm, kf=kf, kr=kr, R02=R02)
 
 		lgm2<-new("LangmuirModel", kon=kon2,koff=koff2, sd=sd, analyteConcentrations=analyteConcentrations,
@@ -817,7 +848,16 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 #'		\url{http://}
 #'
 #'@param sampleFreq numeric the time frequency to collect the SPR data
-#'
+#'@param sd standard deviation used to simulate the nosiy data. 
+#'  zero by default for non-noisy data
+#'@param model currently only used for two different model for 
+#'	Rmax: \cr1)model=1, fixed ligand immobilization model. Where Rmax is
+#'	kept at a costant level for different run or different channel.
+#'	only one Rmax is set through parameter "Rmax". 2)model=2,variable ligand
+#'	immobilization model, where Rmax for each run/channel is not fixed
+#'	and only "efficincy" is assumed to be constant. \cr if model 
+#'	is set to be other values (not 1 or 2), fixed ligand model 
+#'	assumed. 
 #'@return a list of \code{\link{SensorgramData-class}} data object 
 #'		holding the SPR data for different component in the system
 #'@seealso \code{\link{ConformatinalSelectionModel-class}}
@@ -827,17 +867,30 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 #'			\code{\link{SensorgramData-class}}
 #' @export		   
 setGeneric("Simulate", signature="x",
-			function(x, sampleFreq=0.01, sd=0, ...) standardGeneric("Simulate"))
+			function(x, sampleFreq=0.01, sd=0, fix.ligand=TRUE,...) standardGeneric("Simulate"))
 #'@describeIn Simulate to simulate the SPR data based on a Langmuir Model
 setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
-		function(x,sampleFreq=0.01,sd=0)
+		function(x,sampleFreq=0.01,sd=0, fix.ligand=TRUE)
 		{##running the analytical solution of langmuirModel
 			#check the data integrity 
 			if(!CheckModelValidity(x))
 			{
 				return(NULL)
 			}
-			
+			#check the model and prepare the Rmax
+			localRmax<-rep(x@Rmax, length(x@analyteConcentrations))
+			if(!fix.ligand)#variable ligand immobilization model
+			{
+				#check the input for integrity
+				if(length(x@Rligand)!=length(x@analyteConcentrations))
+				{
+					 stop("ERROR: The Rligand has not been set correctly, please check!")
+				}
+				localRmax<-x@Rligand*x@efficiency
+			}
+			#else #fixed Rligand model It has been taken care by now
+			#{
+			#}
 			x_sgd<-new("SensorgramData")#for AB
 			x_sgd_A<-new("SensorgramData")# for A
 			#cat("Rmax:", x@Rmax)
@@ -851,17 +904,20 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 				x_time<-seq(0,x@associationLength,by=sampleFreq)
 				for(i in c(1:length(x@analyteConcentrations)))
 				{
-					temp<-x@Rmax*x@analyteConcentrations[i]/(x@koff/x@kon+x@analyteConcentrations[i])*(1-exp(-1*x_time*(x@kon*x@analyteConcentrations[i]+x@koff)))
+					#cat("****i: round",i, "\n")
+					
+					temp<-localRmax[i]*x@analyteConcentrations[i]/(x@koff/x@kon+x@analyteConcentrations[i])*(1-exp(-1*x_time*(x@kon*x@analyteConcentrations[i]+x@koff)))
 					noise<-rnorm(x_time,0,sd)
+					#cat("temp:", temp);
 					if(i==1)
 					{
 						x_Ass<-data.frame(Time=x_time, RU1=temp+noise)
-						x_Ass_A<-data.frame(Time=x_time, RU1=x@Rmax-temp)
+						x_Ass_A<-data.frame(Time=x_time, RU1=localRmax[i]-temp)
 					}
 					else
 					{
 						x_Ass<-cbind(x_Ass,data.frame(Time=x_time, RU1=temp+noise))
-						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=x@Rmax-temp))
+						x_Ass_A<-cbind(x_Ass_A,data.frame(Time=x_time, RU1=localRmax[i]-temp))
 					}
 				}
 				x_sgd@associationData<-x_Ass
@@ -896,12 +952,12 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 					if(i==1)
 					{
 						x_Diss<-data.frame(Time=x_time, RU1=temp+noise)
-						x_Diss_A<-data.frame(Time=x_time, RU1=x@Rmax-temp)
+						x_Diss_A<-data.frame(Time=x_time, RU1=localRmax[i]-temp)
 					}
 					else
 					{
 						x_Diss<-cbind(x_Diss,data.frame(Time=x_time, RU1=temp+noise))
-						x_Diss_A<-cbind(x_Diss_A,data.frame(Time=x_time, RU1=x@Rmax-temp))
+						x_Diss_A<-cbind(x_Diss_A,data.frame(Time=x_time, RU1=localRmax[i]-temp))
 					}
 				}
 				
@@ -915,7 +971,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 	)
 #'@describeIn Simulate to simulate the SPR data based on a InducedFit Model
 setMethod("Simulate", c("x"="InducedFitModel"),
-		function(x,sampleFreq=0.01,sd=0)
+		function(x,sampleFreq=0.01,sd=0, fix.ligand=TRUE)
 		{##running the analytical solution of langmuirModel
 			#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -933,6 +989,17 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 			x_sgd_AB_star<-new("SensorgramData") #stable AB
 			x_sgd_A<-new("SensorgramData") # A alone
 			
+			localRmax<-rep(Rmax, length(x@BaseModel@analyteConcentrations))
+			if(!fix.ligand)#variable ligand immobilization model
+			{
+				#check the input for integrity
+				if(length(x@BaseModel@Rligand)!=length(x@BaseModel@analyteConcentrations))
+				{
+					 stop("ERROR: The Rligand has not been set correctly, please check!")
+				}
+				localRmax<-x@BaseModel@Rligand*x@BaseModel@efficiency
+			}
+			
 			#x_time<-seq(0,x@associationLength,by=sampleFreq)
 			#we also want to check for the validity
 			if(x@BaseModel@associationLength>0) #we will do this association phase
@@ -949,15 +1016,15 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 					r2<-0.5*((ka1*conc+kd1+ka2+kd2)-sqrt((ka1*conc+kd1-(ka2+kd2))*(ka1*conc+kd1-(ka2+kd2))+4*kd1*ka2))
 					p<-ka1*conc*kd2+kd2*kd1+ka1*conc*ka2;
 					m<-r1-r2;
-					A<-ka1*conc*Rmax*((ka1*conc+kd1-r2)*(ka2+kd2)-ka2*kd1)/(p*m);
-					B<-ka1*conc*Rmax*(kd1*ka2-(ka1*conc+kd1-r1)*(ka2+kd2))/(p*m);
+					A<-ka1*conc*localRmax[i]*((ka1*conc+kd1-r2)*(ka2+kd2)-ka2*kd1)/(p*m);
+					B<-ka1*conc*localRmax[i]*(kd1*ka2-(ka1*conc+kd1-r1)*(ka2+kd2))/(p*m);
 
-					E_bar<-Rmax*kd1*kd2/p
-					ES_star_bar<-Rmax*ka1*conc*ka2/p
+					E_bar<-localRmax[i]*kd1*kd2/p
+					ES_star_bar<-localRmax[i]*ka1*conc*ka2/p
 
 					E<-E_bar+A*exp(-1*r1*x_time)+B*exp(-1*r2*x_time);
 					ES_star<-ES_star_bar+1/kd1*(r1-(ka1*conc+kd1))*A*exp(-1*r1*x_time)+1/kd1*(r2-(ka1*conc+kd1))*B*exp(-1*r2*x_time);
-					ES<-Rmax-E-ES_star
+					ES<-localRmax[i]-E-ES_star
 			
 					if(i==1)
 					{
@@ -1017,7 +1084,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 					
 					ES<-r1/kd1*A*exp(r1*x_time)+r2/kd1*B*exp(r2*x_time)
 					ES_star<- -(r1+kd1)/kd1*A*exp(r1*x_time)-(r2+kd1)/kd1*B*exp(r2*x_time)
-					E<-Rmax+A*exp(r1*x_time)+B*exp(r2*x_time)
+					E<-localRmax[i]+A*exp(r1*x_time)+B*exp(r2*x_time)
 					if(i==1)
 					{
 						x_Diss<-data.frame(Time=x_time, RU1=ES)
@@ -1057,7 +1124,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 #'   save nothing in A_star (no dissociation data).
 #'	Note: this part is a bit confusing. Need more work in the future.
 setMethod("Simulate", c("x"="ConformationalSelectionModel"),
-		function(x, sampleFreq=0.01, sd=0)
+		function(x, sampleFreq=0.01, sd=0, fix.ligand=TRUE)
 		{
 				#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -1075,6 +1142,16 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 			x_sgd_A_star<-new("SensorgramData") #stable A
 			x_sgd_A<-new("SensorgramData") # A alone
 			
+			localRmax<-rep(Rmax, length(x@BaseModel@analyteConcentrations))
+			if(!fix.ligand)#variable ligand immobilization model
+			{
+				#check the input for integrity
+				if(length(x@BaseModel@Rligand)!=length(x@BaseModel@analyteConcentrations))
+				{
+					 stop("ERROR: The Rligand has not been set correctly, please check!")
+				}
+				localRmax<-x@BaseModel@Rligand*x@BaseModel@efficiency
+			}
 			#we also want to check for the validity
 			if(x@BaseModel@associationLength>0) #we will do this association phase
 			{
@@ -1091,12 +1168,12 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 					p<-kd2*kd1+ka2*kd1+ka2*conc*ka1;
 					m<-ka2+kd2;#r1-r2;
 					h<-r1-r2;
-					D1<--1*ka2*ka1*conc*kd2*Rmax*r2/(p*m*h);
-					D2<-ka2*kd2*ka1*conc*Rmax*r1/(p*m*h);
+					D1<--1*ka2*ka1*conc*kd2*localRmax[i]*r2/(p*m*h);
+					D2<-ka2*kd2*ka1*conc*localRmax[i]*r1/(p*m*h);
 
-					A_bar<-Rmax*kd1*kd2/p
+					A_bar<-localRmax[i]*kd1*kd2/p
 					#A_star_bar<-Rmax*ka2*kd1/p
-					AB_bar<-Rmax*ka1*conc*ka2/p;
+					AB_bar<-localRmax[i]*ka1*conc*ka2/p;
 					A<-A_bar+D1*exp(-1*r1*x_time)+D2*exp(-1*r2*x_time)
 					AB<-AB_bar+1/kd2*(r1-(kd2+ka2))*D1*exp(-1*r1*x_time)+1/kd2*(r2-(kd2+ka2))*D2*exp(-1*r2*x_time);
 					
@@ -1104,7 +1181,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 					#cat("length of AB:", length(AB),"\n")
 					#cat("length of Rmax:", length(Rmax), "\n")
 					
-					A_star<-Rmax-A-AB;
+					A_star<-localRmax[i]-A-AB;
 					
 					if(i==1)
 					{
@@ -1156,7 +1233,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 
 					#calculate parameter again
 					ES<-x_R0*exp(-kd1*x_time)
-					E_total<-Rmax-ES
+					E_total<-localRmax[i]-ES
 					if(i==1)
 					{
 						x_Diss<-data.frame(Time=x_time, RU1=ES)
@@ -1182,8 +1259,12 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 		}
 	)
 #'@describeIn Simulate to simulate the SPR data based on a TwoState Model
+#'
+#'@param timeStep numeric the time step used to run numerical simulation\cr
+#' This is only for the Two State model, since the other 3 models are analytical
+#'	calculated.
 setMethod("Simulate", c("x"="TwoStateModel"),
-		function(x, sampleFreq=0.01, timeStep=0.01, sd=0)
+		function(x, sampleFreq=0.01, timeStep=0.01, sd=0, fix.ligand=TRUE)
 		{
 			#check the data integrity 
 			if(!CheckModelValidity(x))
@@ -1210,13 +1291,25 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 				sampleFreq<-timeStep;
 			}
 			
+			localRmax<-rep(Rmax, length(x@BaseModel1@BaseModel@analyteConcentrations))
+			if(!fix.ligand)#variable ligand immobilization model
+			{
+				#check the input for integrity
+				if(length(x@BaseModel1@BaseModel@Rligand)!=length(x@BaseModel1@BaseModel@analyteConcentrations))
+				{
+					 stop("ERROR: The Rligand has not been set correctly, please check!")
+				}
+				localRmax<-x@BaseModel1@BaseModel@Rligand*x@BaseModel1@BaseModel@efficiency
+			}
+			
 			x_sgd<-new("SensorgramData") #unstable AB
 			x_sgd_AB_star<-new("SensorgramData")#stable AB
 			x_sgd_A_star<-new("SensorgramData") #stable A
 			x_sgd_A<-new("SensorgramData") # A alone
 			#cat("kon_i1:",kon_i1,";kd_i1:", kd_i1,";ka_i2:", ka_i2,";kd_i2:", kd_i2,"\n");
 			#cat("kon_c1:",kon_c1,";kd_c1:", kd_c1,";ka_c2:", ka_c2,";kd_c2:", kd_c2,"\n");
-			#cat("Rmax:",Rmax,"\n");
+			#cat("localRmax:",localRmax,"\n");
+			#cat("Rmax:", Rmax, "\n");
 			#we also want to check for the validity
 			if(x@BaseModel1@BaseModel@associationLength>0) #we will do this association phase
 			{
@@ -1234,15 +1327,15 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 					#cat("i:", i,"\n")
 					#cat("length of AB:", length(AB),"\n")
 					#cat("length of Rmax:", length(Rmax), "\n")
-					
+					#cat("***round i:", i, ", and local Rmax:",localRmax[i], "\n");
 					R_B_star<-x_time;
 					R_B<-x_time;
 					R_AB<-x_time;
 					R_AB_star<-x_time;
 					
 					#Ratio_B<-kd_c2/ka_c2;
-					R_B_star[1]<-Rmax/(kd_c2/ka_c2+1);
-					R_B[1]<-Rmax - R_B_star[1];
+					R_B_star[1]<-localRmax[i]/(kd_c2/ka_c2+1);
+					R_B[1]<-localRmax[i] - R_B_star[1];
 					R_AB[1]<-0
 					R_AB_star[1]<-0
 					#R_B_prime[1]<-R_B[1];
@@ -1250,7 +1343,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 				
 					for( j in c(1:length(R_AB)))
 					{
-						R_AB_star_i<-(Rmax-R_B_star[j]-R_AB[j]-R_B[j])
+						R_AB_star_i<-(localRmax[i]-R_B_star[j]-R_AB[j]-R_B[j])
 						deltaR_AB<-kon_i1*conc*R_B[j]-kd_i1*R_AB[j]-ka_i2*R_AB[j]+kd_i2*R_AB_star_i;
 						
 						deltaR_B<- -1*kon_i1*conc*R_B[j]+kd_i1*R_AB[j]-ka_c2*R_B[j]+kd_c2*R_B_star[j];
@@ -1261,7 +1354,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 							R_AB[j+1]<-deltaR_AB*timeStep+R_AB[j];
 							R_B_star[j+1]<-deltaR_B_star*timeStep+R_B_star[j];
 							R_B[j+1]<-deltaR_B*timeStep+R_B[j]
-							R_AB_star[j+1]<-(Rmax-R_B_star[j+1]-R_AB[j+1]-R_B[j+1]);
+							R_AB_star[j+1]<-(localRmax[i]-R_B_star[j+1]-R_AB[j+1]-R_B[j+1]);
 						}
 					}
 #					cat("done.......\n");
@@ -1323,7 +1416,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 					conc0<-0;
 					for( j in c(1:length(ru_detach_AB)))
 					{
-						ru_detach_AB_star_i<-(Rmax-ru_detach_B_star[j]-ru_detach_AB[j]-ru_detach_B[j])
+						ru_detach_AB_star_i<-(localRmax[i]-ru_detach_B_star[j]-ru_detach_AB[j]-ru_detach_B[j])
 						deltaR_AB<-kon_i1*conc0*ru_detach_B[j]-kd_i1*ru_detach_AB[j]-ka_i2*ru_detach_AB[j]+kd_i2*ru_detach_AB_star_i;
 						
 						deltaR_B<- -1*kon_i1*conc0*ru_detach_B[j]+kd_i1*ru_detach_AB[j]-ka_c2*ru_detach_B[j]+kd_c2*ru_detach_B_star[j];
@@ -1335,7 +1428,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 							
 							ru_detach_B_star[j+1]<-deltaR_B_star*timeStep+ru_detach_B_star[j];
 							ru_detach_B[j+1]<-deltaR_B*timeStep+ru_detach_B[j]
-							ru_detach_AB_star[j+1]<-(Rmax-ru_detach_B_star[j+1]-ru_detach_AB[j+1]-ru_detach_B[j+1]);
+							ru_detach_AB_star[j+1]<-(localRmax[i]-ru_detach_B_star[j+1]-ru_detach_AB[j+1]-ru_detach_B[j+1]);
 						}
 		
 					}
@@ -1396,8 +1489,8 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 #'		nonlinear regression is better
 #'@param type integer to indicate which type of analysis in dissociation
 #' 		phase to be used. 
-#'		1. for two state do fitting and then regression. 
-#'		2. for multi-state approximation
+#'		1. for multi-state approximation
+#'		2. for two state do fitting and then regression. 
 #'@param steadyStateStart numeric the starting time for steady state
 #'		optional and if provided, will overwrite the one in sensorgramdata
 #'@param steadyStateEnd numeric the ending time for steady state
@@ -1414,6 +1507,14 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 #'@param control list of control elements for run non-linear regression
 #'@param trace boolean to control whether show the trace of
 #'		nonlinear regression.
+#'@param fix.ligand a boolean indicating which ligand immoblization
+#'		model is using. \cr
+#'		TRUE, the fixed ligand immobilzation model. Rmax is used\cr
+#' 		FALSE, the variable ligand immbolization model. Rligand 
+#'		and efficiency are used. See also \code{\link{LangmuirModel-class}}
+#'@param Rligand the input for the variable immobilization levels of 
+#'		ligands on the chip. This is used by the variable ligand 
+#'		immbolization model.See also \code{\link{LangmuirModel-class}} 
 #'@return a list of parameters estimated
 #'@export
 			#input:
@@ -1427,11 +1528,17 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 	#   type: used to indicating whether we are doing the bi-conformaiton settings
 	#' @importFrom MASS rlm
 	#for import rlm function from MASS package
+	
+	# for ligand variable model, there is no way do the linear fitting. so we 
+	# only do it for nonlinear fitting. if linear fitting is selected, then
+	# no variable ligand is assumed
+	# Also, we also assume this ligand loss doesn't affect the dissocation phase!!!!
+	#
 ####setMethod("FitTwoStateSPR", c("x"="SensorgramData"),#, "sampleFreq"="numeric"),
 FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1, windowSize=10,
 			init.association=NULL,init.dissociation=NULL, 
 			control=list(maxiter = 500,tol = 1e-2, minFactor=1/1E10)
-			,trace=F
+			,trace=F, fix.ligand=TRUE, Rligand=NULL
 			)
 		{
 		
@@ -1473,6 +1580,14 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 				mode<-1;
 				#stop("\n");
 			}
+			if(!fix.ligand&&is.null(Rligand))
+			{
+				stop("ERROR: Rligand can not be null when the variable ligand level is selected");
+			}
+			if(!fix.ligand&&(length(Rligand)!=length(x@analyteConcentrations)))
+			{
+				stop("ERROR: Rligand doesn't have corrected number of elements compared with analyteConcentrations");
+			}
 			
 			#by now, we have set the window correctly
 			#next, let's get mean of the values to do the fitting
@@ -1491,13 +1606,13 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 			}
 			#now we get the means, need to do linear 
 			concs<-x@analyteConcentrations
-			
+			efficiency<-1
 			if(mode==2)
 			{
 				concs_inv<-1/concs
 				#do linear regression to get the KA
 				meanSPR_inv<-1/meanSPR
-				lr<-lm(meanSPR_inv~concs_inv)
+				lr<-lm(meanSPR_inv~concs_inv)  ###<========linear fitting
 				Rmax<-1/lr[[1]][1]
 				KD<-lr[[1]][2]*Rmax
 				mainstr<-expression(paste("Linear Regression:", frac(1,"RUs"),
@@ -1513,15 +1628,30 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 				
 			}else #if(mode==1) the default one
 			{
-				if(is.null(init.association))
+				
+				if(fix.ligand)
 				{
-					start.association=list(Rmax=2*max(meanSPR), KD=2*max(concs))
-				}
-				nlr<-nls(meanSPR~Rmax*concs/(KD+concs), start=init.association,
+					if(is.null(init.association))
+					{
+						init.association=list(Rmax=2*max(meanSPR), KD=2*max(concs))
+					}
+					nlr<-nls(meanSPR~Rmax*concs/(KD+concs), start=init.association,
 							control = control, 
-							trace = TRUE)
+							trace = TRUE) ###<===nonlinear fitting
+				}else
+				{
+					if(is.null(init.association))
+					{
+						init.association=list(efficiency=1.0, KD=2*max(concs))
+					}
+					nlr<-nls(meanSPR~Rligand*efficiency*concs/(KD+concs), start=init.association,
+							control = control, 
+							trace = TRUE) ###<===nonlinear fitting
+				}
 				slr<-summary(nlr)
+				
 				Rmax<-slr[["parameters"]][1,1]
+				efficiency<-slr[["parameters"]][1,1]
 				KD<-slr[["parameters"]][2,1]
 				mainstr<-expression(paste("Nonlinear Regression:RUs=" ,
 								frac(paste("Rmax*",group("[","B","]"),sep=""),paste("kD*",group("[","B","]"),sep=""))
@@ -1530,8 +1660,30 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 				plot(concs,meanSPR,main=mainstr
 					,xlab=expression(group("[","B","]")), 
 					,ylab="RUs", type="p")
-				e_concs<-seq(min(concs),max(concs), by=(max(concs)-min(concs))/100)
-				e_RUs<-Rmax*e_concs/(KD+e_concs)
+				
+				##here, we need to determine the simulation points, for both conc and Rligand
+				###it is dual variables, might be a problem
+				e_concs<-c();
+				e_Rligand<-c();
+				for( k in 1:(length(concs)-1))
+				{
+					temp_conc<-seq(concs[k],concs[k+1], by=(concs[k+1]-concs[k])/10)
+					e_concs<-c(e_concs,temp_conc)
+					if(!fix.ligand)
+					{
+						e_Rligand<-c(e_Rligand,seq(Rligand[k],Rligand[k+1], by=(Rligand[k+1]-Rligand[k])/(length(temp_conc)-1)))
+					}
+				}
+				
+				if(fix.ligand)
+				{
+					e_RUs<-Rmax*e_concs/(KD+e_concs)
+				}else
+				{
+					cat("length: Rligand:",length(Rligand), ";efficiency:",length(efficiency), ";e_concs:",length(e_concs),"\n");
+					e_RUs<-e_Rligand*efficiency*e_concs/(KD+e_concs)
+					
+				}
 				lines(e_concs,e_RUs, lty=2, col=2, lwd=2)
 				legend(min(concs),max(meanSPR),legend=c("fitted"),lty=c(2),col=c(2),lwd=c(2))
 				
@@ -1542,7 +1694,7 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 			#summary(lr)
 			##the intercept is 1/Rmax
 			##the slope is 1/Rmax*1/Ka
-			outList<-list(Rmax=Rmax, KD=KD, Concs=concs, MeanSPR=meanSPR)
+			outList<-list(Rmax=Rmax, KD=KD, Concs=concs, MeanSPR=meanSPR, efficiency=efficiency)
 			#cat(outList)
 			#for dissociation phase, we have 
 			
@@ -1581,6 +1733,8 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 					R2<-slr[["parameters"]][2,1]
 					r1<-slr[["parameters"]][3,1]
 					r2<-slr[["parameters"]][4,1]
+					#update the init.dissociation
+					init.dissociation<-list(R1=R1, R2=R2, r1=r1, r2=r2);
 					Rrs<-c(Rrs,(R1*r1+R2*r2))
 					R0s<-c(R0s,(R1+R2))
 				}

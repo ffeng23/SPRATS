@@ -5,7 +5,8 @@
 \title{Constructor for LangmuirModel}
 \usage{
 LangmuirModel(kon, koff, sd = 0, analyteConcentrations, Rmax,
-  associationLength, dissociationLength, R0 = numeric(), offset = 0)
+  associationLength, dissociationLength, R0 = numeric(), offset = 0,
+  Rligand = numeric, efficiency = 1)
 }
 \seealso{
 \code{\link{LangmuirModel}}
