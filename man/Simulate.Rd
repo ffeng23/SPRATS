@@ -9,20 +9,38 @@
 \alias{Simulate,TwoStateModel-method}
 \title{S4 Geric method to Simluate SPR data}
 \usage{
-Simulate(x, sampleFreq = 0.01, sd = 0, ...)
+Simulate(x, sampleFreq = 0.01, sd = 0, fix.ligand = TRUE, ...)
 
-\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01, sd = 0)
+\S4method{Simulate}{LangmuirModel}(x, sampleFreq = 0.01, sd = 0,
+  fix.ligand = TRUE)
 
-\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01, sd = 0)
+\S4method{Simulate}{InducedFitModel}(x, sampleFreq = 0.01, sd = 0,
+  fix.ligand = TRUE)
 
 \S4method{Simulate}{ConformationalSelectionModel}(x, sampleFreq = 0.01,
-  sd = 0)
+  sd = 0, fix.ligand = TRUE)
 
 \S4method{Simulate}{TwoStateModel}(x, sampleFreq = 0.01, timeStep = 0.01,
-  sd = 0)
+  sd = 0, fix.ligand = TRUE)
 }
 \arguments{
 \item{sampleFreq}{numeric the time frequency to collect the SPR data}
+
+\item{sd}{standard deviation used to simulate the nosiy data. 
+zero by default for non-noisy data}
+
+\item{timeStep}{numeric the time step used to run numerical simulation\cr
+This is only for the Two State model, since the other 3 models are analytical
+calculated.}
+
+\item{model}{currently only used for two different model for 
+Rmax: \cr1)model=1, fixed ligand immobilization model. Where Rmax is
+kept at a costant level for different run or different channel.
+only one Rmax is set through parameter "Rmax". 2)model=2,variable ligand
+immobilization model, where Rmax for each run/channel is not fixed
+and only "efficincy" is assumed to be constant. \cr if model 
+is set to be other values (not 1 or 2), fixed ligand model 
+assumed.}
 }
 \value{
 a list of \code{\link{SensorgramData-class}} data object 
