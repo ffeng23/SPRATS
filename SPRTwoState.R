@@ -289,7 +289,7 @@ setMethod("plot", "SensorgramData",
 #'		the real readout on a SPR machine.  
 #'
 #'@details The idea is to combine the RUs from two different source
-#'		e.g. from two complexes with different comfirmations, as
+#'		e.g. from two complexes with different conformations, as
 #'		an real readout on the SPR machine. It adds up the RUs at
 #'		the same time points to get the sum. Do this through the 
 #'		association and dissociation. Don't try to modify any other 
@@ -836,17 +836,16 @@ TwoStateModel<-function(kon, koff, kf, sd=0, kr,#for induced fit model
 	}		 
 
 #doing the simulation
-#'@title S4 Geric method to Simluate SPR data
+#'@title S4 Generic method to Simulate SPR data
 #'
-#'@description Geric method to run the simulatoin based on the model
+#'@description Generic method to run the simulation based on the model
 #'
 #'@details the each model has different biochemical dynamics to generate
 #'		the data. The Langmuir, induced fit and conformational selection
-#'		models simulate data analytically, but the two state model simulate
-#'		through numerical integration. Please check the detail here
+#'		models simulate data analytically, but the two state model simulates
+#'		through numerical integration. Please check the details here
 #'		\url{http://}
 #'
-
 #'@param sampleFreq numeric the time frequency to collect the SPR data
 #'@param sd standard deviation used to simulate the nosiy data. 
 #'  zero by default for non-noisy data
@@ -927,7 +926,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 			}#end of association
 			#cat("Simulating dissociation phase......\n")
 			#print(x_sgd@associationData)
-			if(x@dissociationLength>0)#we will do this dissociation phage
+			if(x@dissociationLength>0)#we will do this dissociation phase
 			{
 				x_Diss<-data.frame();
 				x_Diss_A<-data.frame();
@@ -955,11 +954,7 @@ setMethod("Simulate", c("x"="LangmuirModel"),#, "sampleFreq"="numeric"),
 					
 					if(i==1)
 					{
-#<<<<<<< HEAD
-#						x_Diss<-data.frame(Time=x_time, RU1=temp+noise)
-#=======
 						x_Diss<-data.frame(Time=x_time, RU1=temp)
-#>>>>>>> b75c23ddb36900fe1cb6aa401c3aca97e7b7ab0e
 						x_Diss_A<-data.frame(Time=x_time, RU1=localRmax[i]-temp)
 					}
 					else
@@ -997,7 +992,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 			x_sgd<-new("SensorgramData") #unstable AB
 			x_sgd_AB_star<-new("SensorgramData") #stable AB
 			x_sgd_A<-new("SensorgramData") # A alone
-
+			
 			localRmax<-rep(Rmax, length(x@BaseModel@analyteConcentrations))
 			if(!fix.ligand)#variable ligand immobilization model
 			{
@@ -1008,7 +1003,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 				}
 				localRmax<-x@BaseModel@Rligand*x@BaseModel@efficiency
 			}
-
+			
 			#x_time<-seq(0,x@associationLength,by=sampleFreq)
 			#we also want to check for the validity
 			if(x@BaseModel@associationLength>0) #we will do this association phase
@@ -1056,7 +1051,7 @@ setMethod("Simulate", c("x"="InducedFitModel"),
 			}#end of association
 			#cat("Simulating dissociation phase......\n")
 			#print(x_sgd@associationData)
-			if(x@BaseModel@dissociationLength>0)#we will do this dissociation phage
+			if(x@BaseModel@dissociationLength>0)#we will do this dissociation phase
 			{
 				x_Diss<-data.frame();
 				x_Diss_AB_star<-data.frame();
@@ -1217,7 +1212,7 @@ setMethod("Simulate", c("x"="ConformationalSelectionModel"),
 			}#end of association
 			#cat("Simulating dissociation phase......\n")
 			#print(x_sgd@associationData)
-			if(x@BaseModel@dissociationLength>0)#we will do this dissociation phage
+			if(x@BaseModel@dissociationLength>0)#we will do this dissociation phase
 			{
 				x_Diss<-data.frame();
 				#x_Diss_A_star<-data.frame();
@@ -1410,7 +1405,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 			}#end of association
 			cat("Simulating dissociation phase......\n")
 			#print(x_sgd@associationData)
-			if(x@BaseModel1@BaseModel@dissociationLength>0)#we will do this dissociation phage
+			if(x@BaseModel1@BaseModel@dissociationLength>0)#we will do this dissociation phase
 			{
 				x_Diss<-data.frame();
 				x_Diss_AB_star<-data.frame();
@@ -1514,7 +1509,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 #'@param steadyStateEnd numeric the ending time for steady state
 #'		optional and if provided, will overwrite the ones in sensorgramdata
 #'@param windowSize numeric the time period used to do approximation to
-#'		estimate the mean dissociaiton rate constant
+#'		estimate the mean dissociation rate constant
 #'@param init.association list of initial values of parameter to do the 
 #'		non-linear regression. It has the following members
 #'		list(Rmax=200, KD=1E-3)
@@ -1525,7 +1520,7 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 #'@param control list of control elements for run non-linear regression
 #'@param trace boolean to control whether show the trace of
 #'		nonlinear regression.
-#'@param fix.ligand a boolean indicating which ligand immoblization
+#'@param fix.ligand a boolean indicating which ligand immobilization
 #'		model is using. \cr
 #'		TRUE, the fixed ligand immobilzation model. Rmax is used\cr
 #' 		FALSE, the variable ligand immbolization model. Rligand 
@@ -1543,17 +1538,17 @@ setMethod("Simulate", c("x"="TwoStateModel"),
 	#    mode: see above "generic" definition
 	#    steadyStateStart and steadyStateEnd: will override the values specified in the dataSet
 	#	start:used to set the starting points for the nls for estimating dissociation phase values
-	#   type: used to indicating whether we are doing the bi-conformaiton settings
+	#   type: used to indicating whether we are doing the bi-conformation settings
 	#' @importFrom MASS rlm
 	#for import rlm function from MASS package
 	
-	# for ligand variable model, there is no way do the linear fitting. so we 
+	# for ligand variable model, there is no way to do the linear fitting. so we 
 	# only do it for nonlinear fitting. if linear fitting is selected, then
-	# no variable ligand is assumed
+	# no variable ligand is assumed.
 	# Also, we also assume this ligand loss doesn't affect the dissocation phase!!!!
 	#
 ####setMethod("FitTwoStateSPR", c("x"="SensorgramData"),#, "sampleFreq"="numeric"),
-FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1, windowSize=10,
+FitTwoStateSPR<-function(x, mode=1,steadyStateStart=-1, steadyStateEnd=-1, windowSize=10,
 			init.association=NULL,init.dissociation=NULL, 
 			control=list(maxiter = 500,tol = 1e-2, minFactor=1/1E10)
 			,trace=F, fix.ligand=TRUE, Rligand=NULL
@@ -1722,104 +1717,91 @@ FitTwoStateSPR<-function(x, mode=1,type=1,steadyStateStart=-1,steadyStateEnd=-1,
 			#RUs<-RUs+rnorm(length(RUs),0,0.001)
 			Rrs<-c()
 			R0s<-c()
-			if(type==2)
+			
+			if(!is.null(init.dissociation))
 			{
-				
-				for(i in 1:length(x@analyteConcentrations))
-				{
-					if(x@analyteConcentrations[i]<=0)
-					{
-						#we do the conc=0 series in this case
-						next
-					}
-					#cat("running ", i,"\n");
-					#doing the nls for each dissociation phase
-					#startList<-
-					if(is.null(init.dissociation))
-					{
-						init.dissociation<-list(R1=20, R2=200,r1=-0.005,r2=-0.001)
-					}
-					RUs<-x@dissociationData[,i*2]
-					times<-x@dissociationData[,i*2-1]
-					#rus<-RUs[,i]
-					#tms<-times[,i]
-					nlr<-nlsLM(RUs~R1*exp(r1*times)+R2*exp(r2*times), start=init.dissociation,
-							control = control, 
-							trace = trace)
-					slr<-summary(nlr)
-					R1<-slr[["parameters"]][1,1]
-					R2<-slr[["parameters"]][2,1]
-					r1<-slr[["parameters"]][3,1]
-					r2<-slr[["parameters"]][4,1]
-					#update the init.dissociation
-					init.dissociation<-list(R1=R1, R2=R2, r1=r1, r2=r2);
-					Rrs<-c(Rrs,(R1*r1+R2*r2))
-					R0s<-c(R0s,(R1+R2))
-				}
-				
-				#then doing regression to estimate the KA
-				mainstr<-expression(paste("Linear Regression:",R[1],r[1],"+",R[2],r[2],"=-kd*R0" ,sep=""))
-								
-				plot(R0s, Rrs, xlab="R0", main=mainstr,
-					ylab=expression(paste(R[1],r[1],"+",R[2],r[2],sep="")),
-					type="p")
-				slr_lm<-rlm(Rrs~R0s-1)
-				outList$Rrs<-Rrs
-				outList$R0s<-R0s
-				outList$kd<-slr_lm[[1]]*-1
-				e_RUs<-outList$kd*-1*R0s
-				lines(R0s,e_RUs, lty=2, col=2, lwd=2)
-				legend(min(R0s),max(e_RUs),legend=c("fitted"),lty=c(2),col=c(2),lwd=c(2))
-				
-			}
+			 cat("eklemeyap") 
+			}  
+			
 			else
 			{
-				#estimate the empirical rate of dissociation
-				#cat("not implemented yet..........\n")
-				for(i in 1:length(x@analyteConcentrations))
-				{
-					if(x@analyteConcentrations[i]<=0)
-					{
-						#we do the conc=0 series in this case
-						next
-					}
-					times<-x@dissociationData[,i*2-1]
-					RUs<-x@dissociationData[,i*2]
-					tms<-times[times<windowSize]
-					rus<-RUs[times<windowSize]
-					
-					#doing the nls for each dissociation phase
-					#startList<-
-					if(is.null(init.dissociation))
-					{
-						init.dissociation<-list(R1=20, r1=0.005)
-					}
-					#Using the nlsLM function from the minpack.lm package which relies on Levenberg-Marquardt algorithm instead of the
-					#Gauss-Newton algorithm of the standard nls function 
-					nlr<-nlsLM(rus~R1*exp(-r1*tms), start=init.dissociation,
-							control = control, 
-							trace = trace)
-					slr<-summary(nlr)
-					R1<-slr[["parameters"]][1,1]
-					#R2<-slr[["parameters"]][2,1]
-					r1<-slr[["parameters"]][2,1]
-					#r2<-slr[["parameters"]][4,1]
-					Rrs<-c(Rrs,(r1))
-					R0s<-c(R0s,(R1))
-				}
-				kd<-mean(Rrs)
-				outList$R0s<-R0s
-				outList$kd<-kd
-				
-				mainstr<-paste("approximation of mean kd\n(window size=",windowSize," secs)",sep="")
-								
-				plot(c(1:length(R0s)),Rrs,  xlab="i", main=mainstr,
-					ylab="kd",
-					type="p")
-				lines(c(1:length(R0s)),rep(kd, length(R0s)),lty=2,col=2, lwd=2)
-				legend(1,max(R0s),legend=c("fitted"),lty=c(2),col=c(2),lwd=c(2))
+#Linear regression for kd			
+		
+			for(i in 1:length(x@analyteConcentrations))
+			{
+			  times<-x@dissociationData[,i*2-1]
+			  RUs<-x@dissociationData[,i*2]
+			  tms<-times[times<windowSize]
+			  rus<-RUs[times<windowSize]
+			  
+			  #doing the nls for each dissociation phase
+			  #startList<-
+			    init.dissociation<-list(R1=20, r1=0.005)
+			  nlr<-nls(rus~R1*exp(-r1*tms), start=init.dissociation,
+			    #       control = control, 
+			           trace = trace)
+			  slr<-summary(nlr)
+			  R1<-slr[["parameters"]][1,1]
+			  #R2<-slr[["parameters"]][2,1]
+			  r1<-slr[["parameters"]][2,1]
+			  #r2<-slr[["parameters"]][4,1]
+			  Rrs<-c(Rrs,(r1))
+			  R0s<-c(R0s,(R1))
+			}
+			kd<-mean(Rrs)
+#			outList$R0s<-R0s
+			outList$kd_linear<-kd
+			
+			mainstr<-paste("approximation of mean kd\n(window size=",windowSize," secs)",sep="")
+			
+			plot(c(1:length(R0s)),Rrs,  xlab="i", main=mainstr,
+			     ylab="kd",
+			     type="p")
+			lines(c(1:length(R0s)),rep(kd, length(R0s)),lty=2,col=2, lwd=2)
+			legend(1,max(R0s),legend=c("fitted"),lty=c(2),col=c(2),lwd=c(2))
+
+#Non-linear regression for kd
+			cat()
+			Rrs<-c()
+			R0s<-c()
+			for(i in 1:length(x@analyteConcentrations))
+			{
+			  cat("running ", i,"\n");
+			  #doing the nls for each dissociation phase
+			  #startList<-
+			    init.dissociation<-list(R1=20, R2=200,r1=-0.005,r2=-0.001)
+			  RUs<-x@dissociationData[,i*2]
+			  times<-x@dissociationData[,i*2-1]
+			  #rus<-RUs[,i]
+			  #tms<-times[,i]
+			  nlr<-nls(RUs~R1*exp(r1*times)+R2*exp(r2*times), start=init.dissociation,
+			           control = control, 
+			           trace = trace)
+			  slr<-summary(nlr)
+			  R1<-slr[["parameters"]][1,1]
+			  R2<-slr[["parameters"]][2,1]
+			  r1<-slr[["parameters"]][3,1]
+			  r2<-slr[["parameters"]][4,1]
+			  Rrs<-c(Rrs,(R1*r1+R2*r2))
+			  R0s<-c(R0s,(R1+R2))
+			}
+			
+			#then doing regression to estimate the KA
+			mainstr<-expression(paste("Linear Regression:",R[1],r[1],"+",R[2],r[2],"=-kd*R0" ,sep=""))
+			
+			plot(R0s, Rrs, xlab="R0", main=mainstr,
+			     ylab=expression(paste(R[1],r[1],"+",R[2],r[2],sep="")),
+			     type="p")
+			slr_lm<-rlm(Rrs~R0s-1)
+			outList$Rrs<-Rrs
+			outList$R0s<-R0s
+			outList$kd_nonlinear<-slr_lm[[1]]*-1
+			e_RUs<-outList$kd_nonlinear*-1*R0s
+			lines(R0s,e_RUs, lty=2, col=2, lwd=2)
+			legend(min(R0s),max(e_RUs),legend=c("fitted"),lty=c(2),col=c(2),lwd=c(2))
 			}
 			par(op);
 			outList
-		}#end of the function
-	
+}
+			#end of the function
+
