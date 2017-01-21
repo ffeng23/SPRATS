@@ -13,7 +13,7 @@ Depends:
     R (>= 3.2.0)
 Imports:
     MASS
-	
+	minpack.lm
 URL: https://github.com/ffeng23/SPRATS.git
 RoxygenNote: 5.0.1
 Collate:
