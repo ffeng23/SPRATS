@@ -3,12 +3,12 @@
 #example for each methods
 
 #define
-projectPath<-"h:/feng/LAB/hg/SPR_models/SPRATS"
+projectPath<-"E:/feng/LAB/hg/SPR_models/SPRATS"
 
-holderPath<-"h:/feng/LAB/hg/SPR_models"
+holderPath<-"E:/feng/LAB/hg/SPR_models"
 
 #feng's directory
-setwd( "h:/feng/LAB/hg/SPR_models")
+setwd( "E:/feng/LAB/hg/SPR_models")
 #to create new R package, with new folder created using the name fields
 package.skeleton(name = "SPRATS",
                  code_files = "TwoState.R") 
@@ -24,10 +24,10 @@ devtools::setup(path=".")
 remove.packages("SPRATS")
 
 #call roxygen2 to process the helper pages from the roxygen comments
-setwd( "h:/feng/LAB/hg/SPR_models/SPRATS")
+setwd( "E:/feng/LAB/hg/SPR_models/SPRATS")
 devtools::document()
 #feng's directory to call to install
-setwd( "h:/feng/LAB/hg/SPR_models")
+setwd( "E:/feng/LAB/hg/SPR_models")
 #install from local directory, but this is different from install.packages
 devtools::install("SPRATS")
 
