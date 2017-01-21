@@ -23,7 +23,7 @@ Combine two SensorgramData object to simulate
 }
 \details{
 The idea is to combine the RUs from two different source
-	e.g. from two complexes with different comfirmations, as
+	e.g. from two complexes with different conformations, as
 	an real readout on the SPR machine. It adds up the RUs at
 	the same time points to get the sum. Do this through the 
 	association and dissociation. Don't try to modify any other 

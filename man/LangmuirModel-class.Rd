@@ -21,8 +21,8 @@ check the manual for the detailed model specifications
 \item{\code{analyteConcentrations}}{numeric vector for different
 analyte concentrations.}
 
-\item{\code{sd}}{numeric standard deviation of the Gaussian noise. 
-by default sd=0, which there is no noise.}
+\item{\code{s_d}}{numeric standard deviation of the Gaussian noise. 
+by default s_d=0, which there is no noise.}
 
 \item{\code{Rmax}}{numeric the maximum RUs levels at the infinite
 high analyte concentration. It is also the maximum level

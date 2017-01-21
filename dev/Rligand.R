@@ -4,10 +4,10 @@
 
 setwd("E:\\feng\\LAB\\hg\\SPR_models\\SPRATS\\dev")
 #Langmuir Model
-lgm<-new("LangmuirModel", kon=2E3, koff=0.001, analyteConcentrations=c(1E-6, 2E-6, 1E-5), associationLength=2000, 
+lgm<-new("LangmuirModel", kon=2E3, koff=0.001, analyteConcentrations=c(1E-6, 2E-6, 1E-5), associationLength=200, 
 	dissociationLength=100,Rmax=50)
 lgm@Rligand<-c(50,50,50)
-lgm2<-new("LangmuirModel", kon=2E3, koff=0.001, analyteConcentrations=c(2E-6, 4E-6, 8E-5, 1.5E-5), associationLength=2000, 
+lgm2<-new("LangmuirModel", kon=2E3, koff=0.001, analyteConcentrations=c(2E-6, 4E-6, 8E-5, 1.5E-5), associationLength=200, 
 	dissociationLength=1000,Rmax=60)
 lgm2@Rligand<-c(60,50,40,30)
 x<-Simulate(lgm, sampleFreq=1)

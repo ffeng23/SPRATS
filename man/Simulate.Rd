@@ -7,7 +7,7 @@
 \alias{Simulate,InducedFitModel-method}
 \alias{Simulate,LangmuirModel-method}
 \alias{Simulate,TwoStateModel-method}
-\title{S4 Geric method to Simluate SPR data}
+\title{S4 Generic method to Simulate SPR data}
 \usage{
 Simulate(x, sampleFreq = 0.01, sd = 0, fix.ligand = TRUE, ...)
 
@@ -47,13 +47,13 @@ a list of \code{\link{SensorgramData-class}} data object
 	holding the SPR data for different component in the system
 }
 \description{
-Geric method to run the simulatoin based on the model
+Generic method to run the simulation based on the model
 }
 \details{
-the each model has different biochemical dynamics to generate
+each model has different biochemical dynamics to generate
 	the data. The Langmuir, induced fit and conformational selection
-	models simulate data analytically, but the two state model simulate
-	through numerical integration. Please check the detail here
+	models simulate data analytically, but the two state model simulates
+	through numerical integration. Please check the details here
 	\url{http://}
 
 the output is the sensorgram data for AB, A and A_star

@@ -64,6 +64,7 @@ It contains different slots for holding both association and
 	header=T, sep="\\t", associationPhaseEnd=80, dissociationPhaseEnd=150)
 
 	plot(rawData)
+
 }
 \seealso{
 \code{\link{ReadSensorgramData}} \code{\link{GetObservedRUs}} \code{\link{SaveSPRData}}
